@@ -82,10 +82,6 @@ module.exports = {
         return this.modulePrefix + moduleName;
     },
 
-    prettify: function(moduleName, text) {
-        return '[' + moduleName + '] ' + text;
-    },
-
     getModuleNameByErrorText: function(text) {
         return text.substr(1, text.indexOf(']') - 1);
     },
@@ -112,33 +108,6 @@ module.exports = {
         ) {
             throw 'The given jQuery collection contains an unexpected number of elements. Expected: ' + collectionSize + ', given: ' + $collection.length + '.';
         }
-    },
-
-    getModuleDataConf: function(module) {
-        var dataConf = module.$object.data(this.getPrefixedModuleClass(module.name));
-        if (typeof dataConf === 'undefined') {
-            dataConf = {};
-        }
-        if (typeof dataConf !== 'object') {
-            throw this.prettify(module.name, 'The data-* attribute\'s content was not a valid JSON. Fetched value: ' + dataConf);
-        }
-
-        return dataConf;
-    },
-
-    getHookConfiguration: function(module, $hook) {
-        if (
-            typeof module === 'undefined' ||
-            typeof $hook === 'undefined'
-        ) {
-            throw '[getHookConfiguration] To get the hook configuration, a module and hook pair needs to be passed to this function.'
-        }
-
-        if ($hook.length !== 1) {
-            throw this.prettify(module.name, 'Getting hook configuration failed. Expected a collection of 1 element, got ' + $hook.length + '.');
-        }
-
-        return $hook.data(module.class);
     },
 
     validateEmail: function(string) {

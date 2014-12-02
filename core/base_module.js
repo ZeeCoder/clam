@@ -1,5 +1,4 @@
-var util = require('./util');
-// var $    = require('jquery');
+var cutil = require('./util');
 
 // Constructor
 // ===========
@@ -11,13 +10,13 @@ function Module($moduleObject, moduleName, defConf, conf) {
     this.module = {
         $object: $moduleObject,
         name: moduleName,
-        class: util.getPrefixedModuleClass(moduleName),
+        class: cutil.getPrefixedModuleClass(moduleName),
         conf: {},
         type: 'prototype'
     };
 
     try {
-        util.validateJQueryObject($moduleObject, 1);
+        cutil.validateJQueryObject($moduleObject, 1);
     } catch (e) {
         this.error(e);
     }
@@ -34,7 +33,7 @@ function Module($moduleObject, moduleName, defConf, conf) {
     }
 
     // Merging in data- configuration
-    var dataConf = util.getModuleDataConf(this.module);
+    var dataConf = this.getDataConfiguration();
     $.extend(this.module.conf, dataConf);
     // this.module.conf = _.merge(this.module.conf, dataConf);
     
@@ -47,16 +46,20 @@ function Module($moduleObject, moduleName, defConf, conf) {
 
 // API
 //====
+Module.prototype.prettifyLog = function(text) {
+    return '[' + this.module.name + '] ' + text;
+};
+
 Module.prototype.log = function(text) {
-    console.log(util.prettify(this.module.name, text));
+    console.log(this.prettifyLog(text));
 };
 
 Module.prototype.warn = function(text) {
-    console.warn(util.prettify(this.module.name, text));
+    console.warn(this.prettifyLog(text));
 };
 
 Module.prototype.error = function(text) {
-    throw util.prettify(this.module.name, text);
+    throw this.prettifyLog(text);
 };
 
 Module.prototype.findHook = function(hookName, isStrict) {
@@ -118,7 +121,7 @@ Module.prototype.findHooks = function(hookName, hookNumLimit, isStrict) {
             $hooks.length !== 0 ||
             isStrict
         ) {
-            throw this.prettify(this.module.name, 'An incorrect number of hooks were found. Expected: ' + hookNumLimit + '. Found: ' + $hooks.length + '. Hook name: "' + hookClassName + '"');
+            throw this.prettifyLog('An incorrect number of hooks were found. Expected: ' + hookNumLimit + '. Found: ' + $hooks.length + '. Hook name: "' + hookClassName + '"');
         }
     }
 
@@ -129,8 +132,57 @@ Module.prototype.getHookClassName = function(hookName) {
     return this.module.class + '__' + hookName;
 };
 
+Module.prototype.getDataConfiguration = function() {
+    var dataConf = this.module.$object.data(cutil.getPrefixedModuleClass(this.module.name));
+    if (typeof dataConf === 'undefined') {
+        dataConf = {};
+    }
+
+    if (typeof dataConf !== 'object') {
+        this.error('The data-* attribute\'s content was not a valid JSON. Fetched value: ' + dataConf);
+    }
+
+    return dataConf;
+};
+
 Module.prototype.getHookConfiguration = function($hook) {
-    return util.getHookConfiguration(this.module, $hook);
+    try {
+        cutil.validateJQueryObject($hook, 1)
+    } catch (e) {
+        this.error(e);
+    }
+
+    return $hook.data(this.module.class);
+};
+
+Module.prototype.expose = function(containerName) {
+    if (typeof containerName === 'undefined') {
+        containerName = 'exposed_modules';
+    }
+    
+    if (typeof window[containerName] === 'undefined') {
+        window[containerName] = {};
+    }
+
+    var moduleName = this.module.name.replace(/\-/g, '_');
+
+    if (this.module.type == 'singleton') {
+        // Expose singleton
+        window[containerName][this.module.name] = this;
+
+        this.warn('Exposed as: "' + containerName + '.' + moduleName + '".');
+    } else {
+        // Expose prototype
+        if (typeof window[containerName][this.module.name] === 'undefined') {
+            window[containerName][this.module.name] = [];
+        }
+
+        moduleCount = window[containerName][this.module.name].length;
+
+        window[containerName][this.module.name].push(this);
+
+        this.warn('Exposed as: "' + containerName + '.' + moduleName + '[' + moduleCount + ']".');
+    }
 };
 
 // Export module
