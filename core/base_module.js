@@ -10,7 +10,7 @@ function Module($moduleObject, moduleName, defConf, conf) {
     this.module = {
         $object: $moduleObject,
         name: moduleName,
-        class: cutil.getPrefixedModuleClass(moduleName),
+        class: cutil.getModuleClass(moduleName),
         conf: {},
         type: 'prototype'
     };
@@ -133,7 +133,7 @@ Module.prototype.getHookClassName = function(hookName) {
 };
 
 Module.prototype.getDataConfiguration = function() {
-    var dataConf = this.module.$object.data(cutil.getPrefixedModuleClass(this.module.name));
+    var dataConf = this.module.$object.data(cutil.getModuleClass(this.module.name));
     if (typeof dataConf === 'undefined') {
         dataConf = {};
     }

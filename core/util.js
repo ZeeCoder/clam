@@ -1,7 +1,16 @@
 var base_module = require('./base_module');
 
 module.exports = {
-    modulePrefix: 'jsm-',
+    moduleConf: {
+        prefix: 'jsm'
+    },
+
+    modifierConf: {
+        prefix: {
+            name: '--',
+            value: '_'
+        }
+    },
 
     // Creates module instances for every DOM element that has the appropriate
     // module class. If the $containerObj jQuery object is given - containing
@@ -17,7 +26,7 @@ module.exports = {
         }
 
         var moduleName = this.getModuleNameByErrorText(errorText);
-        var prefixedModuleName = this.modulePrefix + moduleName;
+        var moduleClass = this.getModuleClass(moduleName);
 
         if (
             typeof config === 'undefined' ||
@@ -30,9 +39,9 @@ module.exports = {
         var $modules = null;
         if (typeof $containerObj !== 'undefined') {
             this.validateJQueryObject($containerObj);
-            $modules = $containerObj.find('.' + prefixedModuleName);
+            $modules = $containerObj.find('.' + moduleClass);
         } else {
-            $modules = $('.' + prefixedModuleName);
+            $modules = $('.' + moduleClass);
         }
 
         // Create module instances
@@ -59,9 +68,9 @@ module.exports = {
         }
 
         var moduleName = this.getModuleNameByErrorText(errorText);
-        var prefixedModuleName = this.modulePrefix + moduleName;
+        var moduleClass = this.getModuleClass(moduleName);
 
-        singleton.getInstance($('.' + prefixedModuleName));
+        singleton.getInstance($('.' + moduleClass));
     },
 
     initiateSingletonsByArray: function(singletonArray) {
@@ -76,10 +85,6 @@ module.exports = {
         for (var i = length - 1; i >= 0; i--) {
             this.initiateSingleton(singletonArray[i]);
         }
-    },
-
-    getPrefixedModuleClass: function(moduleName) {
-        return this.modulePrefix + moduleName;
     },
 
     getModuleNameByErrorText: function(text) {
@@ -125,5 +130,43 @@ module.exports = {
                 return privateModuleScope.instance;
             }
         };
+    },
+
+    getModuleClass: function(name) {
+        return this.moduleConf.prefix + '-' + name;
+    },
+
+    getModifierClass: function(baseName, modifierName, value) {
+        if (typeof value !== 'string') {
+            value = '';
+        } else {
+            value = this.modifierConf.prefix.value + value;
+        }
+
+        return baseName + this.modifierConf.prefix.name + modifierName + value;
+    },
+
+    getClassesByPrefix: function(prefix, $jQObj) {
+        var classes = $jQObj.attr('class');
+        if (!classes) { // if "falsy", for ex: undefined or empty string
+            return [];
+        }
+
+        classes = classes.split(' ');
+        var matches = [];
+        for (var i = 0; i < classes.length; i++) {
+            match = new RegExp('^(' + prefix + ')(.*)').exec(classes[i]);
+            if (match != null) {
+                matches.push(match[0]);
+            }
+        }
+
+        return matches;
+    },
+
+    removeClassesByPrefix: function(prefix, $jQObj) {
+        var matches = this.getClassesByPrefix(prefix, $jQObj);
+        matches = matches.join(' ');
+        $jQObj.removeClass(matches);
     }
 };
