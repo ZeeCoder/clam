@@ -15,7 +15,11 @@ function Modifier($object, name, prefix) {
         prefixedName: prefix + '-' + name
     };
 
-    cutil.validateJQueryObject($object, 1);
+    try {
+        cutil.validateJQueryObject($object, 1);
+    } catch (e) {
+        throw '[modifier: "' + name + '"]' + e;
+    }
 }
 
 // API

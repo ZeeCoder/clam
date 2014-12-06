@@ -1,5 +1,3 @@
-var base_module = require('./base_module');
-
 module.exports = {
     moduleConf: {
         prefix: 'jsm'
@@ -9,6 +7,13 @@ module.exports = {
         prefix: {
             name: '--',
             value: '_'
+        }
+    },
+
+    createPrototypesByArray: function(moduleArray, $containerObj) {
+        var length = moduleArray.length;
+        for (var i = length - 1; i >= 0; i--) {
+            this.createPrototypes(moduleArray[i], {}, $containerObj);
         }
     },
 
@@ -50,13 +55,6 @@ module.exports = {
             $modules.each(function() {
                 new module($(this), config);
             });
-        }
-    },
-
-    createPrototypesByArray: function(moduleArray, $containerObj) {
-        var length = moduleArray.length;
-        for (var i = length - 1; i >= 0; i--) {
-            this.createPrototypes(moduleArray[i], {}, $containerObj);
         }
     },
 
@@ -115,8 +113,8 @@ module.exports = {
         }
     },
 
-    validateEmail: function(string) {
-        return /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(string);  
+    ucfirst: function(string) {
+        return string.charAt(0).toUpperCase() + string.substr(1);
     },
 
     singletonify: function(Module, privateModuleScope) {
