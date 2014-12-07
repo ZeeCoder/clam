@@ -10,10 +10,10 @@ module.exports = {
         }
     },
 
-    createPrototypesByArray: function(moduleArray, $containerObj) {
+    createModulesByArray: function(moduleArray, conf, $containerObj) {
         var length = moduleArray.length;
         for (var i = length - 1; i >= 0; i--) {
-            this.createPrototypes(moduleArray[i], {}, $containerObj);
+            this.createModules(moduleArray[i], conf, $containerObj);
         }
     },
 
@@ -21,23 +21,22 @@ module.exports = {
     // module class. If the $containerObj jQuery object is given - containing
     // one element -, then the function will look for the module classes in that
     // container.
-    createPrototypes: function(module, config, $containerObj) {
+    createModules: function(module, conf, $containerObj) {
         // Getting the module name, to select the DOM elements.
         var errorText;
         try {
-            new module($('<div/>'));
+            new module();
         } catch (e) {
             errorText = e;
         }
-
         var moduleName = this.getModuleNameByErrorText(errorText);
         var moduleClass = this.getModuleClass(moduleName);
 
         if (
-            typeof config === 'undefined' ||
-            !config // falsy values
+            typeof conf === 'undefined' ||
+            !conf // falsy values
         ) {
-            config = {};
+            conf = {};
         }
 
         // Get appropriate module DOM objects
@@ -53,37 +52,37 @@ module.exports = {
         var self = this;
         if ($modules.length > 0) {
             $modules.each(function() {
-                new module($(this), config);
+                new module($(this), conf);
             });
         }
     },
 
-    initiateSingleton: function(singleton) {
-        try {
-            singleton.getInstance();
-        } catch (e) {
-            errorText = e;
-        }
+    // initiateSingleton: function(singleton) {
+    //     try {
+    //         singleton.getInstance();
+    //     } catch (e) {
+    //         errorText = e;
+    //     }
 
-        var moduleName = this.getModuleNameByErrorText(errorText);
-        var moduleClass = this.getModuleClass(moduleName);
+    //     var moduleName = this.getModuleNameByErrorText(errorText);
+    //     var moduleClass = this.getModuleClass(moduleName);
 
-        singleton.getInstance($('.' + moduleClass));
-    },
+    //     singleton.getInstance($('.' + moduleClass));
+    // },
 
-    initiateSingletonsByArray: function(singletonArray) {
-        if (
-            typeof singletonArray !== 'object' ||
-            singletonArray instanceof Array === false
-        ) {
-            throw '[initiateSingletonsByArray] The method expects an array of singletons as parameter.';
-        }
+    // initiateSingletonsByArray: function(singletonArray) {
+    //     if (
+    //         typeof singletonArray !== 'object' ||
+    //         singletonArray instanceof Array === false
+    //     ) {
+    //         throw '[initiateSingletonsByArray] The method expects an array of singletons as parameter.';
+    //     }
 
-        var length = singletonArray.length;
-        for (var i = length - 1; i >= 0; i--) {
-            this.initiateSingleton(singletonArray[i]);
-        }
-    },
+    //     var length = singletonArray.length;
+    //     for (var i = length - 1; i >= 0; i--) {
+    //         this.initiateSingleton(singletonArray[i]);
+    //     }
+    // },
 
     getModuleNameByErrorText: function(text) {
         return text.substr(1, text.indexOf(']') - 1);

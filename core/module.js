@@ -1,10 +1,18 @@
 var cutil = require('./util');
 
+var allowedModuleTypes = ['prototype', 'singleton'];
+var singletonInstances = {};
+
+
 // Constructor
 // ===========
 function Module($object, settings, conf) {
     if (typeof settings.name === 'undefined') {
         throw 'Missing module name.';
+    }
+
+    if (typeof settings.type === 'undefined') {
+        settings.type = 'prototype';
     }
 
     this.module = {
@@ -14,13 +22,24 @@ function Module($object, settings, conf) {
         conf: {},
         events: {},
         hooks: {},
-        type: 'prototype'
+        type: settings.type
     };
+
+    if (allowedModuleTypes.indexOf(settings.type) === -1) {
+        this.error('Unknown module type: "' + settings.type + '". The allowed types are: "' + allowedModuleTypes.join('", "') + '"');
+    }
 
     try {
         cutil.validateJQueryObject($object, 1);
     } catch (e) {
         this.error(e);
+    }
+
+    if (settings.type == 'singleton') {
+        if (typeof singletonInstances[settings.name] !== 'undefined') {
+            this.error('This module is a singleton. One instance was already created.')
+        }
+        singletonInstances[settings.name] = this;
     }
 
     // Checking if the jQuery object has the needed jsm class
@@ -174,10 +193,6 @@ Module.prototype.triggerEvent = function(eventName, args) {
 
     if (typeof this.module.events[eventName] !== 'function') {
         return false;
-    }
-
-    if (args instanceof Array === false) {
-        args = [args];
     }
 
     this.module.events[eventName].apply(this, args);
