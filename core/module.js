@@ -127,6 +127,8 @@ Module.prototype.addHookEvent = function(hookName, eventType, registerEvents) {
     }
 
     $hook.on(eventType, function(){
+        Array.prototype.unshift.call(arguments, this);
+
         if (registerEvents) {
             self.triggerEvent('pre' + eventName, arguments);
         }
@@ -213,14 +215,14 @@ Module.prototype.findHooks = function(hookName, hookNumLimit, isStrict) {
 
     var $moduleContexts = $('.' + this.module.class + '__context');
     $.each($moduleContexts, function() {
-        if (this.module.type == 'singleton') {
+        if (self.module.type == 'singleton') {
             $inContextHooks = $(this).find('.' + hookClassName);
         } else {
             $inContextHooks =
                 $(this)
                 .find('.' + hookClassName)
                 .filter(function() {
-                    return $(this).closest('.' + this.module.class)[0] === this.module.$object[0];
+                    return $(this).closest('.' + self.module.class)[0] === self.module.$object[0];
                 });
         }
                 
