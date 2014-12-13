@@ -69,3 +69,6 @@ clam-style modules.
 Having said all the above, if you are used to optimizing javascript code, I
 would be more than happy to accept pull requests, if that solves issues stopping
 you from using Clam. :)
+
+#####License
+Released under the [MIT](LICENSE) license.
