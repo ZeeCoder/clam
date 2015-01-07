@@ -10,10 +10,10 @@ module.exports = {
         }
     },
 
-    createPrototypesByArray: function(moduleArray, $containerObj) {
+    createPrototypesByArray: function(moduleArray, conf, $containerObj) {
         var length = moduleArray.length;
         for (var i = length - 1; i >= 0; i--) {
-            this.createPrototypes(moduleArray[i], {}, $containerObj);
+            this.createPrototypes(moduleArray[i], conf, $containerObj);
         }
     },
 

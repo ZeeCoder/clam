@@ -29,84 +29,24 @@ function Module($object, settings, conf) {
     }
 
     // Setting up default configuration
-    if (settings.defConf !== null) {
-        $.extend(this.module.conf, settings.defConf);
+    if (settings.conf !== null) {
+        $.extend(this.module.conf, settings.conf);
     }
 
     // Merging in data- configuration
-    var dataConf = this.getDataConfiguration();
-    $.extend(this.module.conf, dataConf);
+    $.extend(this.module.conf, this.getDataConfiguration());
     
     // Merging in passed configuration
     if (typeof conf === 'object') {
         $.extend(this.module.conf, conf);
     }
-
-    // Registering events
-    this.registerEvents(settings.events);
-
-    // Registering hooks
-    this.registerHooks(settings.hooks);
-
-    try {
-        // Calling hook initialization, if the function exists
-        if (typeof this.initializeHooks === 'function') {
-            this.initializeHooks();
-        }
-
-        // Calling property initialization, if the function exists
-        if (typeof this.initializeProperties === 'function') {
-            this.initializeProperties();
-        }
-    } catch (e) {
-        this.error(e);
-    }
 };
 
 // API
 //====
-Module.prototype.registerEvents = function(events) {
-    if (
-        typeof events === 'undefined' ||
-        events instanceof Array === false
-    ) {
-        return false;
-    }
-
-    var eventsLength = events.length;
-    for (var i = eventsLength - 1; i >= 0; i--) {
-        this.module.events[events[i]] = null;
-    };
-};
-
-Module.prototype.registerHooks = function(hookNames) {
-    if (
-        typeof hookNames === 'undefined' ||
-        hookNames instanceof Array === false
-    ) {
-        return false;
-    }
-
-    var hookNamesLength = hookNames.length;
-    for (var i = hookNames.length - 1; i >= 0; i--) {
-        this.module.hooks[hookNames[i]] = null;
-    };
-};
-
-Module.prototype.getHook = function(hookName) {
-    if (typeof this.module.hooks[hookName] === 'undefined') {
-        this.error('No hook named "' + hookName + '" was registered to the module.');
-    }
-    if (this.module.hooks[hookName] === null) {
-        this.module.hooks[hookName] = this.findHooks(hookName);
-    }
-
-    return this.module.hooks[hookName];
-};
-
-Module.prototype.addHookEvent = function(hookName, eventType, registerEvents) {
+Module.prototype.addHookEvent = function(hookName, eventType, addPrePostEvents) {
     var self = this;
-    var $hook = this.getHook(hookName);
+    var $hook = this.getHooks(hookName);
     if ($hook.length === 0) {
         return false;
     }
@@ -119,21 +59,16 @@ Module.prototype.addHookEvent = function(hookName, eventType, registerEvents) {
     };
     var eventName = eventName.join('');
 
-    if (registerEvents) {
-        self.registerEvents([
-            'pre' + eventName,
-            'post' + eventName
-        ]);
-    }
-
-    $hook.on(eventType, function(){
-        if (registerEvents) {
-            self.triggerEvent('pre' + eventName, arguments);
-        }
-        self['on' + eventName].apply(self, arguments);
-        if (registerEvents) {
-            self.triggerEvent('post' + eventName, arguments);
-        }
+    $hook.each(function() {
+        $(this).on(eventType, function(e) {
+            if (addPrePostEvents) {
+                self.triggerEvent('pre' + eventName, [e, $(this)]);
+            }
+            self['on' + eventName].apply(self, [e, $(this)]);
+            if (addPrePostEvents) {
+                self.triggerEvent('post' + eventName, [e, $(this)]);
+            }
+        });
     });
 };
 
@@ -154,39 +89,78 @@ Module.prototype.error = function(text) {
 };
 
 Module.prototype.addEventListener = function(eventName, callback) {
-    if (typeof this.module.events[eventName] === 'undefined') {
-        this.error('The event called "' + eventName + '" does not exist.');
-
-        return false;
-    }
-
     this.module.events[eventName] = callback;
 };
 
 Module.prototype.triggerEvent = function(eventName, args) {
-    if (typeof this.module.events[eventName] === 'undefined') {
-        this.warn('Could not trigger the event called: "' + eventName + '", such an event was not registered.');
-
-        return false;
-    }
-
     if (typeof this.module.events[eventName] !== 'function') {
         return false;
-    }
-
-    if (args instanceof Array === false) {
-        args = [args];
     }
 
     this.module.events[eventName].apply(this, args);
 };
 
-
-Module.prototype.findHook = function(hookName, isStrict) {
-    return this.findHooks(hookName, 1, isStrict);
+/**
+ * Gets a single - or no - hook jQuery object from the module context.
+ * The found hook will be saved, using the hookName as a key. This way, only one
+ * search occurs for any given hookName in the DOM tree.  
+ * Finding more than one hook will result in an exception. (An empty result is
+ * allowed by default.)
+ * @param string hookName The searched hook name.
+ * @param boolean emptyResultNotAllowed If set to true, then not finding a hook
+ * will also throw an exception.
+ * @return jQuery Object (Clam Hook)
+ */
+Module.prototype.getHook = function(hookName, emptyResultNotAllowed) {
+    return this.getHooks(hookName, 1, emptyResultNotAllowed);
 };
 
-Module.prototype.findHooks = function(hookName, hookNumLimit, isStrict) {
+/**
+ * Gets any number of jQuery object - including none - from the module context.
+ * The found hook will be saved, using the hookName as a key. This way, only one
+ * search occurs for any given hookName in the DOM tree.
+ * @param string hookName The searched hook name.
+ * @param int expectedHookNum (optional) Defines exactly how many hook objects
+ * must be returned in the jQuery collection. If given, but the found hooks
+ * count does not equal that number, then an exception will be thrown. 
+ * @param boolean emptyResultNotAllowed If set to true, then not finding hooks
+ * will also throw an exception.
+ * @return jQuery Object (Clam Hook)
+ */
+Module.prototype.getHooks = function(hookName, expectedHookNum, emptyResultNotAllowed) {
+    if (typeof this.module.hooks[hookName] === 'undefined') {
+        this.module.hooks[hookName] = this.findHooks(hookName, expectedHookNum, emptyResultNotAllowed);
+    }
+
+    return this.module.hooks[hookName];
+};
+
+/**
+ * Gets a single - or no - hook jQuery object from the module context using
+ * jQuery selectors. Useful when hooks can be added dinamically to the module.
+ * Finding more than one hook will result in an exception. (An empty result is
+ * allowed by default.)
+ * @param string hookName The searched hook name.
+ * @param boolean emptyResultNotAllowed If set to true, then not finding a hook
+ * will also throw an exception.
+ * @return jQuery Object (Clam Hook)
+ */
+Module.prototype.findHook = function(hookName, emptyResultNotAllowed) {
+    return this.findHooks(hookName, 1, emptyResultNotAllowed);
+};
+
+
+/**
+ * Gets any number of jQuery object - including none - from the module context
+ * using jQuery selectors. Useful when hooks can be added dinamically to the
+ * module.
+ * @param string hookName The searched hook name.
+ * @param int expectedHookNum (optional) Defines exactly how many hook objects
+ * must be returned in the jQuery collection. If given, but the found hooks
+ * count does not equal that number, then an exception will be thrown. 
+ * @return jQuery Object (Clam Hook)
+ */
+Module.prototype.findHooks = function(hookName, expectedHookNum, emptyResultNotAllowed) {
     if (hookName == 'context') {
         throw this.error('The hook name "context" is reserved for other purposes. Please use something else.');
     }
@@ -195,6 +169,7 @@ Module.prototype.findHooks = function(hookName, hookNumLimit, isStrict) {
     var $hooks;
     var $inContextHooks;
     var self = this;
+
 
     if (this.module.type == 'singleton') {
         $hooks = this.module.$object.find('.' + hookClassName);
@@ -213,7 +188,7 @@ Module.prototype.findHooks = function(hookName, hookNumLimit, isStrict) {
 
     var $moduleContexts = $('.' + this.module.class + '__context');
     $.each($moduleContexts, function() {
-        if (this.module.type == 'singleton') {
+        if (self.module.type == 'singleton') {
             $inContextHooks = $(this).find('.' + hookClassName);
         } else {
             $inContextHooks =
@@ -234,14 +209,14 @@ Module.prototype.findHooks = function(hookName, hookNumLimit, isStrict) {
     });
 
     if (
-        typeof hookNumLimit === 'number' &&
-        hookNumLimit != $hooks.length
+        typeof expectedHookNum === 'number' &&
+        expectedHookNum != $hooks.length
     ) {
         if (
             $hooks.length !== 0 ||
-            isStrict
+            emptyResultNotAllowed
         ) {
-            throw this.prettifyLog('An incorrect number of hooks were found. Expected: ' + hookNumLimit + '. Found: ' + $hooks.length + '. Hook name: "' + hookClassName + '"');
+            throw this.prettifyLog('An incorrect number of hooks were found. Expected: ' + expectedHookNum + '. Found: ' + $hooks.length + '. Hook name: "' + hookClassName + '"');
         }
     }
 
