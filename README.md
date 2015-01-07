@@ -7,8 +7,10 @@ prudent in using the provided tools.
 #####What is it?
 
 Clam is a frontend toolset. It provides CommonJS-style modules to help develop
-and organise frontend code. Frontend modules developed with the use of Clam will
-be **maintainable**, **installable** and **extendable**.
+and organise frontend code. Modules developed with the use of Clam will be
+**maintainable** and **extendable**.
+The main goal of the project is to help writing js modules in an organised
+manner, while staying as simple and lightweight as possible.
 
 To use clam, you'll have to learn some naming conventions - inspired by the
 [BEM](http://bem.info/) metodology -, and how to write CommonJS modules
@@ -26,10 +28,10 @@ processed by browserify - would look like this:
     // We assume that we have a "modules" directory which contains the "popup.js" module.
     var popup = require('modules/popup');
 
-    // Instanciate the module
+    // Instantiating the module
     var popup_instance = new popup($('.jsm-popup'));
 
-    // Note: By saving the popup module instance, we could pass it to other modules
+    // Note: By saving the popup module reference, we could pass it to other modules
     // instantiated later in the script.
 
 Then a popup open button in html could look like this:
