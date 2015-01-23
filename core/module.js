@@ -7,6 +7,10 @@ function Module($object, settings, conf) {
         throw 'Missing module name.';
     }
 
+    if (settings.type !== 'singleton') {
+        settings.type = 'prototype';
+    }
+
     this.module = {
         $object: $object,
         name: settings.name,
@@ -14,7 +18,7 @@ function Module($object, settings, conf) {
         conf: {},
         events: {},
         hooks: {},
-        type: 'prototype'
+        type: settings.type
     };
 
     try {
@@ -195,6 +199,7 @@ Module.prototype.findHooks = function(hookName, expectedHookNum, emptyResultNotA
                 $(this)
                 .find('.' + hookClassName)
                 .filter(function() {
+                    console.log(this);
                     return $(this).closest('.' + this.module.class)[0] === this.module.$object[0];
                 });
         }
@@ -263,18 +268,18 @@ Module.prototype.expose = function(containerName) {
 
     if (this.module.type == 'singleton') {
         // Expose singleton
-        window[containerName][this.module.name] = this;
+        window[containerName][moduleName] = this;
 
         this.warn('Exposed as: "' + containerName + '.' + moduleName + '".');
     } else {
         // Expose prototype
-        if (typeof window[containerName][this.module.name] === 'undefined') {
-            window[containerName][this.module.name] = [];
+        if (typeof window[containerName][moduleName] === 'undefined') {
+            window[containerName][moduleName] = [];
         }
 
-        moduleCount = window[containerName][this.module.name].length;
+        moduleCount = window[containerName][moduleName].length;
 
-        window[containerName][this.module.name].push(this);
+        window[containerName][moduleName].push(this);
 
         this.warn('Exposed as: "' + containerName + '.' + moduleName + '[' + moduleCount + ']".');
     }
