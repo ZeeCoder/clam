@@ -1,5 +1,5 @@
 #Clam
-#####(0.2.0-alpha2)
+#####(0.2.1-alpha3)
 
 **An important note:** Clam is under heavy development at the moment, so be
 prudent in using the provided tools.
