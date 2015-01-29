@@ -1,3 +1,5 @@
+var $ = require('jquery');
+
 module.exports = {
     moduleConf: {
         prefix: 'jsm'
@@ -23,15 +25,18 @@ module.exports = {
     // container.
     createPrototypes: function(module, config, $containerObj) {
         // Getting the module name, to select the DOM elements.
-        var errorText;
-        try {
-            new module($('<div/>'));
-        } catch (e) {
-            errorText = e;
-        }
+        // var errorText;
+        // try {
+        //     new module($('<div/>'));
+        // } catch (e) {
+        //     errorText = e;
+        // }
 
-        var moduleName = this.getModuleNameByErrorText(errorText);
+        // var moduleName = this.getModuleNameByErrorText(errorText);
+        var moduleName = this.getModuleName(module);
         var moduleClass = this.getModuleClass(moduleName);
+
+        // console.log(moduleName, this.getModuleName(module));
 
         if (
             typeof config === 'undefined' ||
@@ -58,31 +63,12 @@ module.exports = {
         }
     },
 
-    initiateSingleton: function(singleton) {
-        try {
-            singleton.getInstance();
-        } catch (e) {
-            errorText = e;
-        }
+    getModuleName: function(module) {
+        var funcDef = String(module);
+        var funcName = funcDef.substr('function '.length);
+        funcName = funcName.substr(0, funcName.indexOf('('));
 
-        var moduleName = this.getModuleNameByErrorText(errorText);
-        var moduleClass = this.getModuleClass(moduleName);
-
-        singleton.getInstance($('.' + moduleClass));
-    },
-
-    initiateSingletonsByArray: function(singletonArray) {
-        if (
-            typeof singletonArray !== 'object' ||
-            singletonArray instanceof Array === false
-        ) {
-            throw '[initiateSingletonsByArray] The method expects an array of singletons as parameter.';
-        }
-
-        var length = singletonArray.length;
-        for (var i = length - 1; i >= 0; i--) {
-            this.initiateSingleton(singletonArray[i]);
-        }
+        return funcName.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
     },
 
     getModuleNameByErrorText: function(text) {
@@ -115,19 +101,6 @@ module.exports = {
 
     ucfirst: function(string) {
         return string.charAt(0).toUpperCase() + string.substr(1);
-    },
-
-    singletonify: function(Module, privateModuleScope) {
-        return {
-            getInstance: function($jQObj, conf) {
-                if (!privateModuleScope.instance) {
-                    privateModuleScope.instance = new Module($jQObj, conf);
-                    privateModuleScope.instance.module.type = 'singleton';
-                }
-
-                return privateModuleScope.instance;
-            }
-        };
     },
 
     getModuleClass: function(name) {

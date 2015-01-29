@@ -1,4 +1,5 @@
 var cutil = require('./util');
+var $ = require('jquery');
 
 // Constructor
 // ===========
@@ -34,15 +35,15 @@ function Module($object, settings, conf) {
 
     // Setting up default configuration
     if (settings.conf !== null) {
-        $.extend(this.module.conf, settings.conf);
+        $.extend(true, this.module.conf, settings.conf);
     }
 
     // Merging in data- configuration
-    $.extend(this.module.conf, this.getDataConfiguration());
-    
+    $.extend(true, this.module.conf, this.getDataConfiguration());
+
     // Merging in passed configuration
     if (typeof conf === 'object') {
-        $.extend(this.module.conf, conf);
+        $.extend(true, this.module.conf, conf);
     }
 };
 
@@ -94,6 +95,10 @@ Module.prototype.error = function(text) {
 
 Module.prototype.addEventListener = function(eventName, callback) {
     this.module.events[eventName] = callback;
+};
+
+Module.prototype.getModuleName = function() {
+    return cutil.getModuleName(this);
 };
 
 Module.prototype.triggerEvent = function(eventName, args) {
