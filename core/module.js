@@ -185,6 +185,11 @@ Module.prototype.findHooks = function(hookName, expectedHookNum, emptyResultNotA
             $hooks = $('.' + hookClassName);
         } else {
             $hooks = this.module.$object.find('.' + hookClassName);
+
+            // Adding the main module element if it has the hook class
+            if (this.module.$object.hasClass(hookClassName)) {
+                $hooks = $hooks.add(this.module.$object);
+            }
         }
     } else {
         // Getting all hooks in the module, excluding other instances of the
