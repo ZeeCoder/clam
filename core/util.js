@@ -23,6 +23,8 @@ module.exports = {
         var moduleName = this.getModuleName(module);
         var moduleClass = this.getModuleClass(moduleName);
 
+        // console.log(moduleName, this.getModuleName(module));
+
         if (
             typeof config === 'undefined' ||
             !config // falsy values
