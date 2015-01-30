@@ -35,6 +35,9 @@ module.exports = {
         if (typeof $containerObj !== 'undefined') {
             this.validateJQueryObject($containerObj);
             $modules = $containerObj.find('.' + moduleClass);
+            if ($containerObj.hasClass(moduleClass)) {
+                $modules = $modules.add($containerObj);
+            }
         } else {
             $modules = $('.' + moduleClass);
         }
