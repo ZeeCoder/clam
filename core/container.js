@@ -13,10 +13,14 @@ module.exports = {
         }
 
         if (typeof this.modules[moduleName] !== 'undefined') {
-            throw 'The "' + moduleName + '" key is already set in the container. Adding the module to the container failed.';
+            if ($.isArray(this.modules[moduleName]) && $.isArray(clam_module)) {
+                $.merge(this.modules[moduleName], clam_module);
+            } else {
+                throw 'The "' + moduleName + '" key is already set in the container. Adding the module to the container failed.';
+            }
+        } else {
+            this.modules[moduleName] = clam_module;
         }
-
-        this.modules[moduleName] = clam_module;
     },
 
     get: function(moduleName) {
