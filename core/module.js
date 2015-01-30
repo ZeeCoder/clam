@@ -1,48 +1,66 @@
+'use strict';
 var cutil = require('./util');
+var $ = require('jquery');
 
 // Constructor
 // ===========
 function Module($object, settings, conf) {
-    if (typeof settings.name === 'undefined') {
-        throw 'Missing module name.';
+    var moduleName = cutil.getModuleName(this);
+    var className = cutil.getModuleClass(moduleName);
+
+    var depth = 1;
+    if (typeof settings.hasGlobalHooks === 'undefined') {
+        settings.hasGlobalHooks = false;
     }
+    // Converting possible thruthy values to true
+    settings.hasGlobalHooks = !!settings.hasGlobalHooks;
 
     if (settings.type !== 'singleton') {
-        settings.type = 'prototype';
+        settings.type = 'basic';
+
+        depth = $object.parents('.' + className).length + 1;
+    } else {
+        // Check whether the module can be a singleton or not
+        var classElementCount = $('.' + className).length;
+        if (classElementCount > 1) {
+            throw 'The module' + ' [' + moduleName + '] ' + 'could not be instantiated as a singleton. ' + classElementCount + ' DOM elements were found with the "' + className + '" class instead of just one.';
+        }
     }
 
     this.module = {
         $object: $object,
-        name: settings.name,
-        class: cutil.getModuleClass(settings.name),
+        name: moduleName,
+        class: className,
         conf: {},
         events: {},
         hooks: {},
-        type: settings.type
+        type: settings.type,
+        depth: depth,
+        hasGlobalHooks: settings.hasGlobalHooks
     };
 
     try {
         cutil.validateJQueryObject($object, 1);
     } catch (e) {
-        this.error(e);
+        console.error(e);
     }
 
     // Checking if the jQuery object has the needed jsm class
     if (!$object.hasClass(this.module.class)) {
-        this.error('The given jQuery Object does not have this module\'s class.');
+        console.error('The given jQuery Object does not have this module\'s class.');
     }
 
     // Setting up default configuration
     if (settings.conf !== null) {
-        $.extend(this.module.conf, settings.conf);
+        $.extend(true, this.module.conf, settings.conf);
     }
 
     // Merging in data- configuration
-    $.extend(this.module.conf, this.getDataConfiguration());
-    
+    $.extend(true, this.module.conf, this.getDataConfiguration());
+
     // Merging in passed configuration
     if (typeof conf === 'object') {
-        $.extend(this.module.conf, conf);
+        $.extend(true, this.module.conf, conf);
     }
 };
 
@@ -76,24 +94,12 @@ Module.prototype.addHookEvent = function(hookName, eventType, addPrePostEvents) 
     });
 };
 
-Module.prototype.prettifyLog = function(text) {
-    return '[' + this.module.name + '] ' + text;
-};
-
-Module.prototype.log = function(text) {
-    console.log(this.prettifyLog(text));
-};
-
-Module.prototype.warn = function(text) {
-    console.warn(this.prettifyLog(text));
-};
-
-Module.prototype.error = function(text) {
-    throw this.prettifyLog(text);
-};
-
 Module.prototype.addEventListener = function(eventName, callback) {
     this.module.events[eventName] = callback;
+};
+
+Module.prototype.getModuleName = function() {
+    return cutil.getModuleName(this);
 };
 
 Module.prototype.triggerEvent = function(eventName, args) {
@@ -102,6 +108,10 @@ Module.prototype.triggerEvent = function(eventName, args) {
     }
 
     this.module.events[eventName].apply(this, args);
+};
+
+Module.prototype.prettify = function(message, subject) {
+    return '[' + this.module.name + (subject ? ': ' + subject: '') + '] ' + message;
 };
 
 /**
@@ -165,53 +175,55 @@ Module.prototype.findHook = function(hookName, emptyResultNotAllowed) {
  * @return jQuery Object (Clam Hook)
  */
 Module.prototype.findHooks = function(hookName, expectedHookNum, emptyResultNotAllowed) {
-    if (hookName == 'context') {
-        throw this.error('The hook name "context" is reserved for other purposes. Please use something else.');
-    }
-
-    var hookClassName = this.module.class + '__' + hookName;
+    var self = this;
+    var hookClassName = this.getHookClassName(hookName);
     var $hooks;
     var $inContextHooks;
-    var self = this;
-
 
     if (this.module.type == 'singleton') {
-        $hooks = this.module.$object.find('.' + hookClassName);
+        if (this.module.hasGlobalHooks) {
+            $hooks = $('.' + hookClassName);
+        } else {
+            $hooks = this.module.$object.find('.' + hookClassName);
+        }
     } else {
+        // Getting all hooks in the module, excluding other instances of the
+        // same module inside the current one.
+
+        // Creating a "depthClass" to exclude the same types of modules inside
+        // the actual one when searching for a hook.
+        var depthClass = [];
+        for (var i = this.module.depth; i >= 0; i--) {
+            depthClass.push('.' + this.module.class);
+        }
+        depthClass = depthClass.join(' ');
+
         $hooks =
             this.module.$object
-                .find('.' + hookClassName)
-                .filter(function() {
-                    return $(this).closest('.' + self.module.class)[0] === self.module.$object[0];
-                });
+            .find('.' + hookClassName)
+            // Excluding all hooks inside other module instances
+            .not(depthClass + ' .' + hookClassName)
+            // Excluding all other modules that has the hook class
+            .not(depthClass + '.' + hookClassName);
+
+        // Adding every hook outside of the module instances.
+        if (this.module.hasGlobalHooks) {
+            var $globalHooks =
+                $('.' + hookClassName)
+                // Excluding hooks from within modules
+                .not('.' + this.module.class + ' .' + hookClassName)
+                .not('.' + this.module.class + '.' + hookClassName);
+                    
+            if ($globalHooks.length) {
+                $hooks = $hooks.add($globalHooks);
+            }
+        }
+
+        // Adding the main module element if it has the hook class
+        if (this.module.$object.hasClass(hookClassName)) {
+            $hooks = $hooks.add(this.module.$object);
+        }
     }
-
-    if (this.module.$object.hasClass(hookClassName)) {
-        $hooks = $hooks.add(this.module.$object);
-    }
-
-    var $moduleContexts = $('.' + this.module.class + '__context');
-    $.each($moduleContexts, function() {
-        if (self.module.type == 'singleton') {
-            $inContextHooks = $(this).find('.' + hookClassName);
-        } else {
-            $inContextHooks =
-                $(this)
-                .find('.' + hookClassName)
-                .filter(function() {
-                    console.log(this);
-                    return $(this).closest('.' + this.module.class)[0] === this.module.$object[0];
-                });
-        }
-                
-        if ($inContextHooks.length) {
-            $hooks = $hooks.add($inContextHooks);
-        }
-
-        if ($(this).hasClass(hookClassName)) {
-            $hooks = $hooks.add($(this));
-        }
-    });
 
     if (
         typeof expectedHookNum === 'number' &&
@@ -221,7 +233,8 @@ Module.prototype.findHooks = function(hookName, expectedHookNum, emptyResultNotA
             $hooks.length !== 0 ||
             emptyResultNotAllowed
         ) {
-            throw this.prettifyLog('An incorrect number of hooks were found. Expected: ' + expectedHookNum + '. Found: ' + $hooks.length + '. Hook name: "' + hookClassName + '"');
+            console.error($hooks);
+            throw 'An incorrect number of hooks were found. Expected: ' + expectedHookNum + '. Found: ' + $hooks.length + '. Hook name: "' + hookClassName + '"';
         }
     }
 
@@ -239,19 +252,13 @@ Module.prototype.getDataConfiguration = function() {
     }
 
     if (typeof dataConf !== 'object') {
-        this.error('The data-* attribute\'s content was not a valid JSON. Fetched value: ' + dataConf);
+        console.error('The data-* attribute\'s content was not a valid JSON. Fetched value: ' + dataConf);
     }
 
     return dataConf;
 };
 
 Module.prototype.getHookConfiguration = function($hook) {
-    try {
-        cutil.validateJQueryObject($hook, 1)
-    } catch (e) {
-        this.error(e);
-    }
-
     return $hook.data(this.module.class);
 };
 
@@ -267,21 +274,19 @@ Module.prototype.expose = function(containerName) {
     var moduleName = this.module.name.replace(/\-/g, '_');
 
     if (this.module.type == 'singleton') {
-        // Expose singleton
         window[containerName][moduleName] = this;
 
-        this.warn('Exposed as: "' + containerName + '.' + moduleName + '".');
+        console.warn('Exposed as: "' + containerName + '.' + moduleName + '".');
     } else {
-        // Expose prototype
         if (typeof window[containerName][moduleName] === 'undefined') {
             window[containerName][moduleName] = [];
         }
 
-        moduleCount = window[containerName][moduleName].length;
+        var moduleCount = window[containerName][moduleName].length;
 
         window[containerName][moduleName].push(this);
 
-        this.warn('Exposed as: "' + containerName + '.' + moduleName + '[' + moduleCount + ']".');
+        console.warn('Exposed as: "' + containerName + '.' + moduleName + '[' + moduleCount + ']".');
     }
 };
 

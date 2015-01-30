@@ -18,6 +18,7 @@ function Modifier($object, name, prefix) {
     try {
         cutil.validateJQueryObject($object, 1);
     } catch (e) {
+        // console.error($object);
         throw '[modifier: "' + name + '"]' + e;
     }
 }
