@@ -11,8 +11,20 @@ with them.)
 
 BEM means: "**B**lock **E**lement **M**odifier".
 
+Block, element and modifier names are "kebab-cased". Block names must have the
+"b-" prefix. Element name's must have the block name as prefix, separated by
+double underscores. Modifiers must have the block or element's name as prefix,
+separated by double dashes. Examples:
+
+```
+.b-a-block // The block's name
+.b-a-block__an-element // An element
+.b-a-block__a-modifier // A block modifier
+.b-a-block__an-element--another-modifier // An element modifier
+```
+
 This naming convention is usually used for CSS only, but Clam uses it for it's
-modules too.
+modules too in a similar fashion.
 
 Explaining the conventions is easier through examples, so here's one (From the clam demo.):
 
