@@ -64,6 +64,12 @@ For the building process - from the "raw" clam modules and scss files -, Gulp
 and Browserify are the preferred tools. The clam demo is a working example for
 this.
 
+#####JSDoc
+
+JSDoc generated documentation can be found under the jsdoc/ folder.
+
+Generation is done via the `jsdoc core/ -r -d jsdoc` command from the root.
+
 #####Full documentation (Work in progress)
 
 - [Naming conventions](docs/naming_conventions.md)
