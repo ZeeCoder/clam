@@ -56,14 +56,19 @@ for example: "clam_container.get('popup').open('contact')".)
 
 Installation is done via [Bower](http://bower.io/).
 
-    bower install clam
+    bower install clam --save-dev
+
+#####Building
+
+For the building process - from the "raw" clam modules and scss files -, Gulp
+and Browserify are the preferred tools. The clam demo is a working example for
+this.
 
 #####Full documentation (Work in progress)
 
 - [Naming conventions](docs/naming_conventions.md)
-- [Build tools](docs/build_tools.md)
-- [Creating a module](docs/creating_a_module.md)
-- [Extending a module](docs/extending_a_module.md)
+- [The Clam module](docs/the_clam_module.md)
+- [Best Practices](docs/best_practices.md)
 
 #####Disclaimer
 Although Clam is very lightweight, performance is not guaranteed for big
