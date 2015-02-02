@@ -28,7 +28,7 @@ modules too in a similar fashion.
 
 Explaining the conventions is easier through examples, so here's one (From the clam demo.):
 
-**SCSS**
+####SCSS
 ```scss
 // "b-" here is a prefix for CSS blocks. Clam modules use the "jsm-" prefix,
 // so javascript modules and CSS blocks are easy to distinguish.
@@ -99,7 +99,7 @@ $amp: ".b-btn";
 }
 ```
 
-**HTML**
+####HTML
 
 ```html
 <!-- A large button. -->
@@ -144,4 +144,38 @@ having this class will cause an error. -->
 <div class="jsm-popup">
     <!-- Some type of solution for containing different types of popups. -->
 </div>
+```
+
+####Changing the prefixes
+
+**CAUTION**: This feature is not yet tested properly.
+
+The default module prefix is "jsm-", and the block prefix is "b-". (Which will
+be important for the modifier module.)
+
+If you're used to a different BEM notation, these prefixes and separators can be
+changed.
+
+So for example a standard BEM notation
+("blockname__elementname__modifier_value") can be achieved too.
+
+####Code
+
+```js
+var cutil = require('clam/core/util');
+
+// You can change any of the following
+cutil.notation: {
+    module: {
+        prefix: 'jsm-',
+        separator: '__'
+    },
+
+    modifier: {
+        prefix: 'b-',
+        elementSeparator: '__',
+        modifierSeparator: '--',
+        valueSeparator: '_'
+    }
+};
 ```

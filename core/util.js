@@ -3,14 +3,28 @@ var $ = require('jquery');
 var container = require('./container');
 
 module.exports = {
-    moduleConf: {
-        prefix: 'jsm'
-    },
+    // moduleConf: {
+    //     prefix: 'jsm'
+    // },
 
-    modifierConf: {
-        prefix: {
-            name: '--',
-            value: '_'
+    // modifierConf: {
+    //     prefix: {
+    //         name: '--',
+    //         value: '_'
+    //     }
+    // },
+
+    notation: {
+        module: {
+            prefix: 'jsm-',
+            separator: '__'
+        },
+
+        modifier: {
+            prefix: 'b-',
+            elementSeparator: '__',
+            modifierSeparator: '--',
+            valueSeparator: '_'
         }
     },
 
@@ -100,17 +114,17 @@ module.exports = {
     },
 
     getModuleClass: function(name) {
-        return this.moduleConf.prefix + '-' + name;
+        return this.notation.module.prefix + name;
     },
 
     getModifierClass: function(baseName, modifierName, value) {
         if (typeof value !== 'string') {
             value = '';
         } else {
-            value = this.modifierConf.prefix.value + value;
+            value = this.notation.modifier.valueSeparator + value;
         }
 
-        return baseName + this.modifierConf.prefix.name + modifierName + value;
+        return baseName + this.notation.modifier.modifierSeparator + modifierName + value;
     },
 
     getClassesByPrefix: function(prefix, $jQObj) {

@@ -4,7 +4,7 @@ var cutil = require('./util');
 // ===========
 function Modifier($object, name, prefix) {
     if (typeof prefix !== 'string') {
-        prefix = 'b';
+        prefix = cutil.notation.modifier.prefix;
     }
 
     // Attributes
@@ -12,7 +12,7 @@ function Modifier($object, name, prefix) {
         $object: $object,
         prefix: prefix,
         name: name,
-        prefixedName: prefix + '-' + name
+        prefixedName: cutil.notation.modifier.prefix + name
     };
 
     try {
@@ -52,7 +52,7 @@ Modifier.prototype.get = function(name) {
         return false;
     }
 
-    value = classes[0].split('_');
+    value = classes[0].split(cutil.notation.modifier.valueSeparator);
 
     // Modifier found, but doesn't have a specific value
     if (typeof value[1] == 'undefined') {

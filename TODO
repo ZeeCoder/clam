@@ -1,8 +1,7 @@
 
 CLAM
-- Some form of Javascript documentation about the files. (JSDoc?)
+- writing the rest of the jsDoc 
 - Adding tests (Karma + Mocha?)
 - remove outdated methods (ex.: HookEvent)
 - add promise support to support extendability.
 - deletion of modules?
-- changing prefixes and separators? (b-, jsm-)

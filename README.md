@@ -75,6 +75,7 @@ Generation is done via the `jsdoc core/ -r -d jsdoc` command from the root.
 - [Naming conventions](docs/naming_conventions.md)
 - [The Clam module](docs/the_clam_module.md)
 - [Best Practices](docs/best_practices.md)
+- [The Modifier Module](docs/modifier_module.md)
 
 #####Disclaimer
 Although Clam is very lightweight, performance is not guaranteed for big

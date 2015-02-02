@@ -270,7 +270,7 @@ Module.prototype.findHooks = function(hookName, expectedHookNum, emptyResultNotA
 };
 
 Module.prototype.getHookClassName = function(hookName) {
-    return this.module.class + '__' + hookName;
+    return this.module.class + cutil.notation.module.separator + hookName;
 };
 
 Module.prototype.getDataConfiguration = function() {
