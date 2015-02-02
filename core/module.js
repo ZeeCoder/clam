@@ -1,8 +1,4 @@
 'use strict';
-/**
- * The core Clam Module.
- * @module module
- */
 var cutil = require('./util');
 var clam_container = require('./container');
 var $ = require('jquery');
@@ -82,9 +78,8 @@ function Module($object, settings, conf) {
 //         this.module.$object.remove();
 //     }
 
-//     if (typeof clam_container.modules[this.module.name] !== 'undefined') {
-//         delete clam_container.modules[this.module.name];
-//     }
+//     clam_container.removeModule(this);
+//     // clam_container.clean(this.module.name);
 // };
 
 Module.prototype.addHookEvent = function(hookName, eventType, addPrePostEvents) {
