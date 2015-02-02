@@ -5,6 +5,8 @@ A Clam Module is a CommonJS module with some inherited methods.
 This documentation will explain the logic behind these modules. If you want to see
 code instead, please feel free to check out the demo application. 
 
+If you use Sublime Text, then a [snippet](https://gist.github.com/ZeeCoder/29c67fd326311e40ff38) is also available for you.
+
 #####Instantiation
 
 A module's name must be in strict UpperCamelCase. This will be automatically

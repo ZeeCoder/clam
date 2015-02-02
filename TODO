@@ -2,16 +2,7 @@
 CLAM
 - Some form of Javascript documentation about the files. (JSDoc?)
 - Adding tests (Karma + Mocha?)
-- clam automatikus event regisztrációk kivétele. (HookEvent pl) Feleslegesek
-- ha nincs egy selector üres, akkor az ne dobjon modul inicializáláskor hibát. (pl parallax.js)
-- add promise support
-- modulok törlésének módja?
-- prefixek módosításának lehetősége
-
-scss / javascript
-b-*
-jsm-*
-hook names
-block and element names
-
-
+- remove outdated methods (ex.: HookEvent)
+- add promise support to support extendability.
+- deletion of modules?
+- changing prefixes and separators? (b-, jsm-)
