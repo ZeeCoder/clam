@@ -1,13 +1,15 @@
 #Clam
 #####(0.3.0-alpha2)
 
-**An important note:** Clam is under heavy development at the moment, so be
+**An important note:** Clam is under heavy development ATM, so be
 prudent in using the provided tools.
 
 #####What is it?
 
-Clam is a frontend toolset. It provides CommonJS-style modules to help develop
-and organise frontend code. Modules developed with the use of Clam will be
+Clam is a frontend toolset. It encourages organizing frontend widgets in
+CommonJS modules. These modules can then be instantiated once or multiple times
+on a single page, depending on whether they are "singleton" on "basic" modules.
+Modules developed with the use of Clam will be 
 **maintainable** and **extendable**.
 The main goal of the project is to help writing js modules in an organised
 manner, while staying as simple and lightweight as possible.
@@ -16,31 +18,39 @@ To use clam, you'll have to learn some naming conventions - inspired by the
 [BEM](http://bem.info/) metodology -, and how to write CommonJS modules
 Clam-style.
 
-A demo application is available here:
+To get started, a demo application is available here:
 [Clam Demo](https://github.com/ZeeCoder/clam-demo).
+
+#####What it's not
+
+Clam is not a frontend framework. It has nothing to do with "views" or "models"
+for example. If you need them, implementing such features is up to you.
 
 #####A quick example
 
-Suppose we have a module called "popup". Using it in an app.js file - which is
-processed by browserify - would look like this:
+Suppose we have a singleton module called "popup". Using it in an app.js file -
+which is processed by browserify - would look like this:
 
     // Getting the module
-    // We assume that we have a "modules" directory which contains the "popup.js" module.
-    var popup = require('modules/popup');
-
-    // Instantiating the module
-    var popup_instance = new popup($('.jsm-popup'));
-
-    // Note: By saving the popup module reference, we could pass it to other modules
-    // instantiated later in the script.
+    // We assume that we have a "clam_module" directory which contains the
+    // "popup.js" module.
+    var cutil = require('clam/core/util');
+    var popup = require('clam_module/popup');
+    
+    // Instantiating the module with the default configuration.
+    cutil.createPrototypes(popup);
+    
+    // Note: By using the "createPrototypes" helper method, the created
+    // prototype will be registered to the clam container, so other modules
+    // can later access it by calling: "clam_container.get('popup')".
 
 Then a popup open button in html could look like this:
 
-    <div class="jsm-popup__context jsm-popup__open-btn" data-jsm-popup='{"target": "contact"}'></div>
+    <div class="jsm-popup__open-btn" data-jsm-popup='{"type": "contact"}'></div>
 
-Which would open the "contact" popup. The same could be achieved by calling the
-saved instance's appropriate method, for example:
-`popup_instance.open('contact')`.
+Which would open the "contact" popup. (Depending on the implementation, the same
+effect could be achieved by calling the popup prototype's appropriate method,
+for example: "clam_container.get('popup').open('contact')".)
 
 #####Installation
 
@@ -54,8 +64,6 @@ Installation is done via [Bower](http://bower.io/).
 - [Build tools](docs/build_tools.md)
 - [Creating a module](docs/creating_a_module.md)
 - [Extending a module](docs/extending_a_module.md)
-
-(*JS documentation will follow, most likely via JSDoc.*)
 
 #####Disclaimer
 Although Clam is very lightweight, performance is not guaranteed for big

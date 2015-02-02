@@ -1,20 +1,17 @@
 
 CLAM
+- Some form of Javascript documentation about the files. (JSDoc?)
+- Adding tests (Karma + Mocha?)
 - clam automatikus event regisztrációk kivétele. (HookEvent pl) Feleslegesek
 - ha nincs egy selector üres, akkor az ne dobjon modul inicializáláskor hibát. (pl parallax.js)
-- add testing (w/ Mocha)
 - add promise support
-- add some form of dependency resolution (függőségek kezelése macerás (AddDependency, getDependency? Hasonlóképpen singletonok egymás elérése? (GetSingleton?)))
-- remove the "context" idea, and rework the methods accordingly (context DOM subtree exclusion: http://stackoverflow.com/questions/21770531/jquery-selector-that-excludes-a-subtree-of-the-dom)
-
-work in progress
-gulp, browserify
-
+- modulok törlésének módja?
+- prefixek módosításának lehetősége
 
 scss / javascript
 b-*
 jsm-*
-__context
 hook names
 block and element names
+
 
