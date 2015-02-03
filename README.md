@@ -1,5 +1,5 @@
 #Clam
-#####(0.3.0-alpha3)
+#####(0.4.0-alpha1)
 
 **An important note:** Clam is under heavy development ATM, so be
 prudent in using the provided tools.
@@ -74,6 +74,7 @@ Generation is done via the `jsdoc core/ -r -d jsdoc` command from the root.
 
 - [Naming conventions](docs/naming_conventions.md)
 - [The Clam module](docs/the_clam_module.md)
+- [Events And Promises](docs/events_and_promises.md)
 - [Best Practices](docs/best_practices.md)
 - [The Modifier Module](docs/modifier_module.md)
 
