@@ -99,11 +99,12 @@ Module.prototype.triggerEvent = function(eventName, args) {
     var functionReturn = this.module.events[eventName].apply(this, args);
     if (!q.isPromise(functionReturn)) {
         var deferred = q.defer();
-        if (functionReturn) { // If thruthy, resolve the promise
-            deferred.resolve();
-        } else {
-            deferred.reject();
+        if (functionReturn === undefined) {
+            // No return value was given, so we assume the flow should not be
+            // interrupted
+            functionReturn = true;
         }
+        deferred.resolve(!functionReturn);
         functionReturn = deferred.promise;
     }
 

@@ -1,6 +1,6 @@
 {
   "name": "clam",
-  "version": "0.4.0-alpha2",
+  "version": "0.4.0-alpha3",
   "homepage": "https://github.com/ZeeCoder/clam",
   "authors": [
     "Hubert Viktor <rpgmorpheus@gmail.com>"
@@ -12,6 +12,6 @@
   "private": true,
   "dependencies": {
     "jquery": ">=1.9.0",
-    "q": "~1.0"
+    "q": ">=1.0.0"
   }
 }
