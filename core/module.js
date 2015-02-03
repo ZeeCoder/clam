@@ -2,6 +2,7 @@
 var cutil = require('./util');
 var clam_container = require('./container');
 var $ = require('jquery');
+var q = require('q');
 
 /**
  * @constructor
@@ -82,34 +83,6 @@ function Module($object, settings, conf) {
 //     // clam_container.clean(this.module.name);
 // };
 
-Module.prototype.addHookEvent = function(hookName, eventType, addPrePostEvents) {
-    var self = this;
-    var $hook = this.getHooks(hookName);
-    if ($hook.length === 0) {
-        return false;
-    }
-
-    var eventName = hookName.split('-');
-    eventName.push(eventType);
-    var eventNameLength = eventName.length;
-    for (var i = eventNameLength - 1; i >= 0; i--) {
-        eventName[i] = cutil.ucfirst(eventName[i]);
-    };
-    var eventName = eventName.join('');
-
-    $hook.each(function() {
-        $(this).on(eventType, function(e) {
-            if (addPrePostEvents) {
-                self.triggerEvent('pre' + eventName, [e, $(this)]);
-            }
-            self['on' + eventName].apply(self, [e, $(this)]);
-            if (addPrePostEvents) {
-                self.triggerEvent('post' + eventName, [e, $(this)]);
-            }
-        });
-    });
-};
-
 Module.prototype.addEventListener = function(eventName, callback) {
     this.module.events[eventName] = callback;
 };
@@ -120,10 +93,32 @@ Module.prototype.getModuleName = function() {
 
 Module.prototype.triggerEvent = function(eventName, args) {
     if (typeof this.module.events[eventName] !== 'function') {
-        return false;
+        return this.getPromise();
     }
 
-    this.module.events[eventName].apply(this, args);
+    var functionReturn = this.module.events[eventName].apply(this, args);
+    if (!q.isPromise(functionReturn)) {
+        var deferred = q.defer();
+        if (functionReturn) { // If thruthy, resolve the promise
+            deferred.resolve();
+        } else {
+            deferred.reject();
+        }
+        functionReturn = deferred.promise;
+    }
+
+    return functionReturn;
+};
+
+Module.prototype.getPromise = function(isRejected) {
+    var deferred = q.defer();
+    if (isRejected) {
+        deferred.reject();
+    } else {
+        deferred.resolve();
+    }
+
+    return deferred.promise;
 };
 
 Module.prototype.prettify = function(message, subject) {
