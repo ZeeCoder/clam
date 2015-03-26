@@ -31,22 +31,26 @@ for example. If you need them, implementing such features is up to you.
 Suppose we have a singleton module called "popup". Using it in an app.js file -
 which is processed by browserify - would look like this:
 
-    // Getting the module
-    // We assume that we have a "clam_module" directory which contains the
-    // "popup.js" module.
-    var cutil = require('clam/core/util');
-    var popup = require('clam_module/popup');
-    
-    // Instantiating the module with the default configuration.
-    cutil.createPrototypes(popup);
-    
-    // Note: By using the "createPrototypes" helper method, the created
-    // prototype will be registered to the clam container, so other modules
-    // can later access it by calling: "clam_container.get('popup')".
+```js
+// Getting the module
+// We assume that we have a "clam_module" directory which contains the
+// "popup.js" module.
+var cutil = require('clam/core/util');
+var popup = require('clam_module/popup');
+
+// Instantiating the module with the default configuration.
+cutil.createPrototypes(popup);
+
+// Note: By using the "createPrototypes" helper method, the created
+// prototype will be registered to the clam container, so other modules
+// can later access it by calling: "clam_container.get('popup')".
+```
 
 Then a popup open button in html could look like this:
 
-    <div class="jsm-popup__open-btn" data-jsm-popup='{"type": "contact"}'></div>
+```js
+<div class="jsm-popup__open-btn" data-jsm-popup='{"type": "contact"}'></div>
+```
 
 Which would open the "contact" popup. (Depending on the implementation, the same
 effect could be achieved by calling the popup prototype's appropriate method,
@@ -56,7 +60,9 @@ for example: "clam_container.get('popup').open('contact')".)
 
 Installation is done via [Bower](http://bower.io/).
 
-    bower install clam --save-dev
+```
+bower install clam --save-dev
+```
 
 #####Building
 
