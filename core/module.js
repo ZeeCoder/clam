@@ -83,6 +83,16 @@ function Module($object, settings, conf) {
 //     // clam_container.clean(this.module.name);
 // };
 
+Module.prototype.ns = function(eventNames) {
+    var self = this;
+    var eventArray = eventNames.split(' ');
+    eventArray = eventArray.map(function(eventName) {
+        return eventName + '.' + self.module.class.replace('-', '_');
+    });
+
+    return eventArray.join(' ');
+};
+
 Module.prototype.addEventListener = function(eventName, callback) {
     this.module.events[eventName] = callback;
 };
@@ -129,7 +139,7 @@ Module.prototype.prettify = function(message, subject) {
 /**
  * Gets a single - or no - hook jQuery object from the module context.
  * The found hook will be saved, using the hookName as a key. This way, only one
- * search occurs for any given hookName in the DOM tree.  
+ * search occurs for any given hookName in the DOM tree.
  * Finding more than one hook will result in an exception. (An empty result is
  * allowed by default.)
  * @param {string} hookName The searched hook name.
@@ -148,7 +158,7 @@ Module.prototype.getHook = function(hookName, emptyResultNotAllowed) {
  * @param {string} hookName The searched hook name.
  * @param {int} [expectedHookNum] (optional) Defines exactly how many hook objects
  * must be returned in the jQuery collection. If given, but the found hooks
- * count does not equal that number, then an exception will be thrown. 
+ * count does not equal that number, then an exception will be thrown.
  * @param boolean [emptyResultNotAllowed] If set to true, then not finding hooks
  * will also throw an exception.
  * @return {jQuery} Clam hook.
@@ -232,7 +242,7 @@ Module.prototype.findHooks = function(hookName, expectedHookNum, emptyResultNotA
                 // Excluding hooks from within modules
                 .not('.' + this.module.class + ' .' + hookClassName)
                 .not('.' + this.module.class + '.' + hookClassName);
-                    
+
             if ($globalHooks.length) {
                 $hooks = $hooks.add($globalHooks);
             }
@@ -285,7 +295,7 @@ Module.prototype.expose = function(containerName) {
     if (typeof containerName === 'undefined') {
         containerName = 'exposed_modules';
     }
-    
+
     if (typeof window[containerName] === 'undefined') {
         window[containerName] = {};
     }
