@@ -1,5 +1,6 @@
 #Clam
-[![project status](https://stillmaintained.com/ZeeCoder/clam.png)](https://stillmaintained.com/ZeeCoder/clam)
+[![Project Status](http://stillmaintained.com/ZeeCoder/clam.png)](http://stillmaintained.com/ZeeCoder/clam)
+
 #####(0.4.0-alpha3)
 
 **An important note:** Clam is under heavy development ATM, so be
