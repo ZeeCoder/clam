@@ -3,15 +3,24 @@
 
 #####(0.4.0-alpha3)
 
-**An important note:** Clam is under heavy development ATM, so be
-prudent in using the provided tools.
+**The development of clam is stopped.**
+
+We used it in several projects, and in most of them writing Clam-modules was a
+delight. It never really took off hovewer, and I just had the feeling that
+something is not exactly right with the tool.
+
+My main problem with Clam, is that it does a bit too much magic.
+So in order to deal with that issue, I'm taking the good ideas from the project,
+and I will create several independent node modules out of them instead.
+
+---
 
 #####What is it?
 
 Clam is a frontend toolset. It encourages organizing frontend widgets in
 CommonJS modules. These modules can then be instantiated once or multiple times
 on a single page, depending on whether they are "singleton" on "basic" modules.
-Modules developed with the use of Clam will be 
+Modules developed with the use of Clam will be
 **maintainable** and **extendable**.
 The main goal of the project is to help writing js modules in an organised
 manner, while staying as simple and lightweight as possible.
