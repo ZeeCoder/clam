@@ -13,6 +13,14 @@ My main problem with Clam, is that it does a bit too much magic.
 So in order to deal with that issue, I'm taking the good ideas from the project,
 and I will create several independent node modules out of them instead.
 
+**Clam's successor modules are:**
+
+ - [Modifier](https://github.com/ZeeCoder/z-modifier)
+ - [HookFinder](https://github.com/ZeeCoder/z-hook-finder)
+ - [Namespacer](https://github.com/ZeeCoder/z-namespacer)
+ - [container](https://github.com/ZeeCoder/z-container)
+ - [dom-config](https://github.com/ZeeCoder/z-dom-config)
+
 ---
 
 #####What is it?
